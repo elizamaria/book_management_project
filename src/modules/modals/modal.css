@@ -1,0 +1,12 @@
+.modal {
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  padding: 32px;
+  background-color:#1b394b;
+  /* background-color:#f1f8f9; */
+  /* color: white; */
+  border-radius: 10px;
+}
