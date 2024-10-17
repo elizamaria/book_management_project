@@ -6,10 +6,11 @@ import useSWRMutation from "swr/mutation";
 import { API_URL } from "../constants";
 import { useModalContext } from "../modals/modal-context";
 import { axiosInstance } from "../../api/utils";
-import { updateBook, useUpdateBookById } from "../../api/useUpdateBook";
-import { BookType } from "../../routes/types";
+import { useUpdateBookById } from "../../api/useUpdateBook";
 import { useSWRConfig } from "swr";
-import { useBooks } from "../../api/useBooks";
+import { BookType } from "../types";
+import { useTheme } from "@mui/material/styles";
+import { ErrorMessage } from "./error-message";
 
 const BookSchema = Yup.object().shape({
   title: Yup.string()
@@ -24,40 +25,36 @@ const BookSchema = Yup.object().shape({
     .min(10, "Too Short!")
     .max(150, "Too Long!")
     .required("Required"),
+  type: Yup.string().required("Required"), // TODO: turn into a select?
 });
 
 async function createBook(
   url: string,
-  { arg }: { arg: { title: string; author: string } }
+  {
+    arg,
+  }: {
+    arg: { title: string; author: string; description: string; type: string };
+  }
 ) {
   return await axiosInstance
     .post(url, {
-      title: arg.title,
-      author: arg.author,
+      ...arg,
     })
     .then((res) => res.data);
 }
 
-export const CreateModal = (props: {
-  bookData?: {
-    id: number;
-    title?: string;
-    author?: string;
-    description?: string;
-  };
-}) => {
+export const CreateModal = (props: { bookData?: BookType }) => {
   const { bookData } = props;
   const { handleModal } = useModalContext();
-  const { trigger, data, error, isMutating } = useSWRMutation(
-    API_URL,
-    createBook
-  );
+  const { trigger, error } = useSWRMutation(API_URL, createBook);
   const { triggerUpdate } = useUpdateBookById();
-  const { cache, mutate } = useSWRConfig();
+  const { mutate } = useSWRConfig();
+  const theme = useTheme();
 
   const isUpdatingBook = props.bookData?.id;
+
   return (
-    <Box sx={{}} className="modal" display="flex" flexDirection="column">
+    <Box className="modal" display="flex" flexDirection="column">
       <Typography id="modal-modal-title" variant="h5" component="h2">
         {isUpdatingBook ? "Update book" : "Create a book"}
       </Typography>
@@ -68,8 +65,8 @@ export const CreateModal = (props: {
         initialValues={{
           title: bookData?.title || "",
           author: bookData?.author || "",
-          description: "",
-          // year: 20
+          description: bookData?.description || "",
+          type: bookData?.type || "",
         }}
         validationSchema={BookSchema}
         onSubmit={async (values, { setSubmitting }) => {
@@ -80,6 +77,7 @@ export const CreateModal = (props: {
                 id: bookData.id,
               });
 
+              // updates book details cache
               mutate([API_URL, bookData.id.toString()], book);
             } else {
               await trigger({
@@ -95,8 +93,8 @@ export const CreateModal = (props: {
           }
         }}
       >
-        {({ values, submitForm, resetForm, isSubmitting, touched, errors }) => (
-          <Form>
+        {({ submitForm, isSubmitting, touched, errors }) => (
+          <Form style={{ marginTop: "24px" }}>
             <Stack display="flex" flexDirection="column" gap={"24px"}>
               <Field
                 component={TextField}
@@ -127,6 +125,19 @@ export const CreateModal = (props: {
                     : ""
                 }
               />
+              <Field
+                component={TextField}
+                maxRows={4}
+                name="type"
+                label="Type"
+                error={errors.type && touched.type}
+                helperText={errors.type && touched.type ? errors.type : ""}
+              />
+              {error ? (
+                <ErrorMessage
+                  message={"There was an error completing your request"}
+                />
+              ) : null}
             </Stack>
 
             <Stack

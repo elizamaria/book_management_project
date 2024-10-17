@@ -12,10 +12,10 @@ export default function Main() {
       sx={{
         height: "100vh",
         display: "flex",
-        color: "white",
+        padding: "24px",
       }}
     >
-      <Grid container spacing={2} sx={{ margin: 0 }}>
+      <Grid container columnGap={3} sx={{ margin: 0 }} flexWrap={"nowrap"}>
         <BookList setSelectedBook={setSelectedBook} />
         <BookDetails
           selectedBookId={selectedBook}

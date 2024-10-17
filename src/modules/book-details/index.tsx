@@ -1,12 +1,13 @@
-import { Grid, Typography, Container, Stack } from "@mui/material";
+import { Grid, Typography, Container, Stack, IconButton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useBookById } from "../../api/useBookById";
 import { useDeleteBook } from "../../api/useDeleteBook";
 import { ModeEditOutline } from "@mui/icons-material";
 import { useModalContext } from "../modals/modal-context";
-import { CreateModal } from "../book-list/book-modal";
-import { useSWRConfig } from "swr";
+import { CreateModal } from "../common/book-modal";
+import TextSnippetIcon from "@mui/icons-material/TextSnippet";
+import { ErrorMessage } from "../common/error-message";
 
 export const BookDetails = (props: {
   selectedBookId: number | null;
@@ -17,55 +18,65 @@ export const BookDetails = (props: {
   const { handleModal } = useModalContext();
 
   const { book, isError, isLoading } = useBookById(selectedBookId);
-  const { cache, mutate } = useSWRConfig();
-  const { triggerDelete, isMutatingDelete } = useDeleteBook(selectedBookId);
+  const { triggerDelete, isMutatingDelete } = useDeleteBook();
 
   const renderDetails = () => {
-    if (!book) return <div>Please select a book</div>;
-    if (isError) return <div>Failed to fetch book</div>;
-    if (isLoading) return <h2>Loading...</h2>;
+    if (!book) return <Typography>No book selected</Typography>;
+    if (isError)
+      return <ErrorMessage message={"Failed to fetch book details"} />;
+    if (isLoading) return <h2>Fetching book details...</h2>;
 
     return (
       <Container>
-        <Typography variant="subtitle2" style={{ color: "white" }}>
-          {book.title}
-        </Typography>
-        <Typography variant="subtitle2" style={{ color: "white" }}>
-          {book.author}
-        </Typography>
-        <Typography variant="subtitle2" style={{ color: "white" }}>
-          {book.year}
-        </Typography>
-        <Typography variant="subtitle2" style={{ color: "white" }}>
-          {book.type}
-        </Typography>
-        <Typography variant="subtitle2" style={{ color: "white" }}>
-          {book.description}
-        </Typography>
+        <Stack display={"flex"} flexDirection={"row"} gap={3}>
+          <img src="book.png" width="300px" style={{ width: "150px" }} />
+          <Stack spacing={2}>
+            <Typography variant="h4">{book.title}</Typography>
+            <Typography variant="h5">{book.author}</Typography>
+            <div
+              style={{
+                backgroundColor: theme.palette.primary.light,
+                padding: "4px 8px",
+                borderRadius: "4px",
+                alignSelf: "flex-start",
+              }}
+            >
+              <Typography variant="subtitle2">{book.type}</Typography>
+            </div>
+          </Stack>
+        </Stack>
+
+        <Stack display="flex" gap={3} margin="32px 0px">
+          <Typography variant="h6" fontStyle={"italic"}>
+            {book.description}
+          </Typography>
+        </Stack>
 
         <Stack display="flex" flexDirection="row" alignItems={"center"} gap={3}>
-          <DeleteOutlineIcon
-            fontSize="medium"
+          <IconButton
             aria-label="delete"
-            role="button"
-            sx={{ cursor: "pointer" }}
+            tabIndex={0}
+            color="primary"
             onClick={async () => {
               try {
-                if (!isMutatingDelete) {
+                if (isMutatingDelete || !selectedBookId) {
                   return;
                 }
-                await triggerDelete();
+                await triggerDelete({
+                  id: selectedBookId,
+                });
                 props.setSelectedBook(null);
               } catch (e) {
                 console.error(e);
               }
             }}
-          />
-          <ModeEditOutline
+          >
+            <DeleteOutlineIcon />
+          </IconButton>
+          <IconButton
             aria-label="edit"
-            role="button"
-            fontSize="medium"
-            sx={{ cursor: "pointer" }}
+            color="primary"
+            tabIndex={0}
             onClick={() => {
               handleModal(
                 <CreateModal
@@ -78,7 +89,9 @@ export const BookDetails = (props: {
                 />
               );
             }}
-          />
+          >
+            <ModeEditOutline />
+          </IconButton>
         </Stack>
       </Container>
     );
@@ -86,16 +99,31 @@ export const BookDetails = (props: {
 
   return (
     <Grid
-      sm={8}
+      xs={8}
       item
       display={"flex"}
       padding={theme.spacing(2)}
       gap={theme.spacing(3)}
       flexDirection={"column"}
+      sx={{
+        borderRadius: "32px",
+        backgroundColor: "#F0EBE3",
+        alignItems: "flex-start",
+      }}
     >
-      <Typography variant="subtitle1" color={"primary"}>
-        Selected Book
-      </Typography>
+      <Stack
+        display={"flex"}
+        flexDirection={"row"}
+        alignItems={"center"}
+        gap={3}
+      >
+        {" "}
+        <TextSnippetIcon fontSize="large" color={"primary"} />
+        <Typography variant="h5" component={"h2"}>
+          Book Details
+        </Typography>
+      </Stack>
+
       <Container
         style={{ borderBottom: `1px solid ${theme.palette.grey[800]}` }}
       ></Container>

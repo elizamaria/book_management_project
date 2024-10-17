@@ -5,12 +5,15 @@ import {
   Button,
   Stack,
   useTheme,
+  List,
+  ListItemButton,
 } from "@mui/material";
-import { BookType } from "../../routes/types";
-import { CreateModal } from "./book-modal";
+import { BookType } from "../types";
+import { CreateModal } from "../common/book-modal";
 import { useModalContext } from "../modals/modal-context";
 import { useBooks } from "../../api/useBooks";
-
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import { ErrorMessage } from "../common/error-message";
 export const BookList = (props: {
   setSelectedBook: (bookId: number) => void;
 }) => {
@@ -19,48 +22,66 @@ export const BookList = (props: {
   const { books, isError, isLoading } = useBooks();
 
   const renderList = () => {
-    if (isError) return <div>Failed to fetch books</div>;
-    if (isLoading) return <h2>Loading...</h2>;
+    if (isError)
+      return <ErrorMessage message={"Failed to fetch the list of books"} />;
+
+    if (isLoading) return <Typography variant="caption">Loading...</Typography>;
 
     return (
-      <Stack spacing={2}>
+      <List sx={{ gap: "8px", width: "100%" }}>
         {books?.map((book: BookType) => (
-          <Typography
-            key={book.id}
-            variant="subtitle2"
-            onClick={() => props.setSelectedBook(book.id)}
-          >
-            {book.title}
-          </Typography>
+          <ListItemButton key={book.id}>
+            <Typography
+              sx={{ cursor: "pointer" }}
+              role=""
+              onClick={() => props.setSelectedBook(book.id)}
+            >
+              {book.title}
+            </Typography>
+          </ListItemButton>
         ))}
-      </Stack>
+      </List>
     );
   };
 
   return (
     <Grid
-      sm={4}
+      xs={4}
       item
       alignItems={"flex-start"}
       flexDirection={"column"}
       padding={theme.spacing(2)}
       gap={theme.spacing(3)}
       display={"flex"}
-      sx={{ borderRight: `1px solid ${theme.palette.grey[800]}` }}
+      sx={{
+        borderRadius: "32px",
+        backgroundColor: "#F0EBE3",
+      }}
     >
-      <Typography variant="subtitle1" color={"primary"}>
-        Book list
-      </Typography>
+      <Stack
+        display={"flex"}
+        flexDirection={"row"}
+        alignItems={"center"}
+        gap={3}
+      >
+        <MenuBookIcon fontSize="large" color={"primary"} />
+        <Typography variant="h5" component={"h2"}>
+          Book list
+        </Typography>
+      </Stack>
+
       <Container
         style={{ borderBottom: `1px solid ${theme.palette.grey[800]}` }}
       ></Container>
+
       <Button
         variant="outlined"
+        sx={{ ml: "16px" }}
         onClick={() => {
           handleModal(<CreateModal />);
         }}
       >
-        Create new book{" "}
+        Create
       </Button>
       {renderList()}
     </Grid>
