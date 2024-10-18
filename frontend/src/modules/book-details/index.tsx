@@ -112,7 +112,15 @@ export const BookDetails = (props: {
         </Stack>
       </Container>
     );
-  }, [book, isError, isLoading, isMutatingDelete, selectedBookId]);
+  }, [
+    book,
+    isError,
+    isLoading,
+    isMutatingDelete,
+    selectedBookId,
+    handleModal,
+    triggerDelete,
+  ]);
 
   return (
     <Grid

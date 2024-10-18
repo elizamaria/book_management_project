@@ -1,6 +1,5 @@
 import useSWRMutation from "swr/mutation";
 import { axiosInstance } from "./utils";
-import { BookType } from "../modules/types";
 
 async function createBook(
   url: string,
