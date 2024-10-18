@@ -16,6 +16,7 @@ import { CreateModal } from "../common/book-modal";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import { ErrorMessage } from "../common/error-message";
 import ListIcon from "@mui/icons-material/List";
+import { useCallback } from "react";
 
 export const BookDetails = (props: {
   matchesSmallQuery: boolean;
@@ -30,7 +31,7 @@ export const BookDetails = (props: {
   const { book, isError, isLoading } = useBookById(selectedBookId);
   const { triggerDelete, isMutatingDelete } = useDeleteBook();
 
-  const renderDetails = () => {
+  const renderDetails = useCallback(() => {
     if (!book) return <Typography>No book selected</Typography>;
     if (isError)
       return <ErrorMessage message={"Failed to fetch book details"} />;
@@ -111,7 +112,7 @@ export const BookDetails = (props: {
         </Stack>
       </Container>
     );
-  };
+  }, [book, isError, isLoading, isMutatingDelete, selectedBookId]);
 
   return (
     <Grid

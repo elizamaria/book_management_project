@@ -1,6 +1,6 @@
 import useSWRMutation from "swr/mutation";
 import { axiosInstance } from "./utils";
-import { API_URL } from "../modules/constants";
+import { BookType } from "../modules/types";
 
 async function createBook(
   url: string,
@@ -17,7 +17,7 @@ async function createBook(
     .then((res) => res.data);
 }
 export function useCreateBook() {
-  const { trigger, error } = useSWRMutation(API_URL, createBook);
+  const { trigger, error } = useSWRMutation("/books", createBook);
 
   return {
     triggerCreate: trigger,

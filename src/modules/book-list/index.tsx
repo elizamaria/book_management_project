@@ -15,7 +15,9 @@ import { useModalContext } from "../modals/modal-context";
 import { useBooks } from "../../api/useBooks";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { ErrorMessage } from "../common/error-message";
-import { useState } from "react";
+import { preload } from "swr";
+import { fetcherById } from "../../api/useBookById";
+
 export const BookList = (props: {
   drawerStatus: boolean;
   matchesSmallQuery: boolean;
@@ -26,6 +28,10 @@ export const BookList = (props: {
   const { handleModal } = useModalContext();
   const { books, isError, isLoading } = useBooks();
 
+  const handlePrefetching = (id: number) => {
+    preload(["/books", id.toString()], fetcherById);
+  };
+
   const renderList = () => {
     if (isError)
       return <ErrorMessage message={"Failed to fetch the list of books"} />;
@@ -33,19 +39,29 @@ export const BookList = (props: {
     if (isLoading) return <Typography variant="caption">Loading...</Typography>;
 
     const onClickItem = (book: BookType) => {
+      console.log("set book", book.id);
       props.setSelectedBook(book.id);
       props.setOpenDrawer(false);
     };
 
+    if (!books?.length) return <Typography>No books found</Typography>;
+
     return (
-      <List sx={{ gap: "8px", width: "100%" }}>
+      <List
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
+          width: "100%",
+        }}
+      >
         {books?.map((book: BookType) => (
-          <ListItemButton key={book.id}>
-            <Typography
-              sx={{ cursor: "pointer" }}
-              role=""
-              onClick={() => onClickItem(book)}
-            >
+          <ListItemButton
+            key={book.id}
+            onClick={() => onClickItem(book)}
+            onMouseEnter={() => handlePrefetching(book.id)}
+          >
+            <Typography sx={{ cursor: "pointer" }} role="">
               {book.title}
             </Typography>
           </ListItemButton>
@@ -67,7 +83,7 @@ export const BookList = (props: {
           keepMounted: true,
         }}
       >
-        {renderList()}
+        <Box padding={3}>{renderList()}</Box>
       </SwipeableDrawer>
     );
   }
@@ -99,7 +115,10 @@ export const BookList = (props: {
       </Stack>
 
       <Box
-        style={{ borderBottom: `1px solid ${theme.palette.grey[800]}` }}
+        style={{
+          borderBottom: `1px solid ${theme.palette.grey[800]}`,
+          width: "100%",
+        }}
       ></Box>
 
       <Button

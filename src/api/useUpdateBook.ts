@@ -1,4 +1,3 @@
-import { API_URL } from "../modules/constants";
 import { axiosInstance } from "./utils";
 import useSWRMutation from "swr/mutation";
 
@@ -17,7 +16,7 @@ export async function updateBook(
 
 export function useUpdateBookById() {
   const { trigger, data, error, isMutating } = useSWRMutation(
-    API_URL,
+    "/books",
     updateBook
   );
 

@@ -1,5 +1,4 @@
 import useSWRMutation from "swr/mutation";
-import { API_URL } from "../modules/constants";
 import { axiosInstance } from "./utils";
 
 async function deleteBook(url: string, { arg }: { arg: { id: number } }) {
@@ -8,14 +7,8 @@ async function deleteBook(url: string, { arg }: { arg: { id: number } }) {
     .then((res) => res.data);
 }
 
-// TODO: Implement useDeleteBook
 export function useDeleteBook() {
-  // const { trigger, error, isMutating } = useSWRMutation(
-  //   [API_URL, id?.toString()], //+ "/" +,
-  //   ([url, id]) => deleteBook(url, id)
-  // );
-
-  const { trigger, error, isMutating } = useSWRMutation(API_URL, deleteBook);
+  const { trigger, error, isMutating } = useSWRMutation("/books", deleteBook);
 
   return {
     triggerDelete: trigger,

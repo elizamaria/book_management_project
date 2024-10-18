@@ -32,13 +32,6 @@ export default function Main() {
           setOpenDrawer={setOpenDrawer}
         />
       </Grid>
-
-      {/* <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        open={open}
-        onClose={() => setOpen(false)}
-        message="Book was successfully created"
-      /> */}
     </Container>
   );
 }

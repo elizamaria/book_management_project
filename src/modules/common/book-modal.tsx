@@ -2,7 +2,6 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import { TextField } from "formik-mui";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import { API_URL } from "../constants";
 import { useModalContext } from "../modals/modal-context";
 import { useUpdateBookById } from "../../api/useUpdateBook";
 import { useSWRConfig } from "swr";
@@ -60,7 +59,7 @@ export const CreateModal = (props: { bookData?: BookType }) => {
               });
 
               // updates book details cache
-              mutate([API_URL, bookData.id.toString()], book);
+              mutate(["/books", bookData.id.toString()], book);
             } else {
               await triggerCreate({
                 ...values,

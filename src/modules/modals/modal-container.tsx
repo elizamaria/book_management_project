@@ -1,7 +1,6 @@
 import Modal from "@mui/material/Modal";
 import "./modal.css";
 import { useModalContext } from "./modal-context";
-import { useTheme } from "@mui/material/styles";
 
 export const ModalWrapper = () => {
   const { modalState, handleModal, modalContent } = useModalContext();
