@@ -1,4 +1,11 @@
-import { Grid, Typography, Container, Stack, IconButton } from "@mui/material";
+import {
+  Grid,
+  Typography,
+  Container,
+  Stack,
+  IconButton,
+  Box,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useBookById } from "../../api/useBookById";
@@ -8,10 +15,13 @@ import { useModalContext } from "../modals/modal-context";
 import { CreateModal } from "../common/book-modal";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import { ErrorMessage } from "../common/error-message";
+import ListIcon from "@mui/icons-material/List";
 
 export const BookDetails = (props: {
+  matchesSmallQuery: boolean;
   selectedBookId: number | null;
   setSelectedBook: (id: number | null) => void;
+  setOpenDrawer: (status: boolean) => void;
 }) => {
   const { selectedBookId } = props;
   const theme = useTheme();
@@ -28,8 +38,13 @@ export const BookDetails = (props: {
 
     return (
       <Container>
-        <Stack display={"flex"} flexDirection={"row"} gap={3}>
-          <img src="book.png" width="300px" style={{ width: "150px" }} />
+        <Stack
+          display={"flex"}
+          flexDirection={{ xs: "column", sm: "row" }}
+          gap={3}
+          alignItems={{ xs: "flex-start", sm: "center" }}
+        >
+          <img src="book.png" width="300px" alt="" style={{ width: "150px" }} />
           <Stack spacing={2}>
             <Typography variant="h4">{book.title}</Typography>
             <Typography variant="h5">{book.author}</Typography>
@@ -46,11 +61,11 @@ export const BookDetails = (props: {
           </Stack>
         </Stack>
 
-        <Stack display="flex" gap={3} margin="32px 0px">
+        <Box display="flex" gap={3} margin="32px 0px">
           <Typography variant="h6" fontStyle={"italic"}>
             {book.description}
           </Typography>
-        </Stack>
+        </Box>
 
         <Stack display="flex" flexDirection="row" alignItems={"center"} gap={3}>
           <IconButton
@@ -100,7 +115,8 @@ export const BookDetails = (props: {
 
   return (
     <Grid
-      xs={8}
+      xs={true}
+      sm={8}
       item
       display={"flex"}
       padding={theme.spacing(2)}
@@ -116,13 +132,26 @@ export const BookDetails = (props: {
         display={"flex"}
         flexDirection={"row"}
         alignItems={"center"}
-        gap={3}
+        justifyContent={"space-between"}
+        width={"100%"}
       >
         {" "}
-        <TextSnippetIcon fontSize="large" color={"primary"} />
-        <Typography variant="h5" component={"h2"}>
-          Book Details
-        </Typography>
+        <Box display={"flex"} gap={3}>
+          <TextSnippetIcon fontSize="large" color={"primary"} />
+          <Typography variant="h5" component={"h2"}>
+            Book Details
+          </Typography>
+        </Box>
+        <Box>
+          {props.matchesSmallQuery ? (
+            <IconButton
+              onClick={() => props.setOpenDrawer(true)}
+              aria-label="close"
+            >
+              <ListIcon color={"primary"} />
+            </IconButton>
+          ) : null}
+        </Box>
       </Stack>
 
       <Container

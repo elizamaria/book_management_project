@@ -1,12 +1,13 @@
 import {
   Grid,
   Typography,
-  Container,
   Button,
   Stack,
   useTheme,
   List,
   ListItemButton,
+  Box,
+  SwipeableDrawer,
 } from "@mui/material";
 import { BookType } from "../types";
 import { CreateModal } from "../common/book-modal";
@@ -14,7 +15,11 @@ import { useModalContext } from "../modals/modal-context";
 import { useBooks } from "../../api/useBooks";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { ErrorMessage } from "../common/error-message";
+import { useState } from "react";
 export const BookList = (props: {
+  drawerStatus: boolean;
+  matchesSmallQuery: boolean;
+  setOpenDrawer: (status: boolean) => void;
   setSelectedBook: (bookId: number) => void;
 }) => {
   const theme = useTheme();
@@ -27,6 +32,11 @@ export const BookList = (props: {
 
     if (isLoading) return <Typography variant="caption">Loading...</Typography>;
 
+    const onClickItem = (book: BookType) => {
+      props.setSelectedBook(book.id);
+      props.setOpenDrawer(false);
+    };
+
     return (
       <List sx={{ gap: "8px", width: "100%" }}>
         {books?.map((book: BookType) => (
@@ -34,7 +44,7 @@ export const BookList = (props: {
             <Typography
               sx={{ cursor: "pointer" }}
               role=""
-              onClick={() => props.setSelectedBook(book.id)}
+              onClick={() => onClickItem(book)}
             >
               {book.title}
             </Typography>
@@ -43,6 +53,24 @@ export const BookList = (props: {
       </List>
     );
   };
+
+  if (props.matchesSmallQuery) {
+    return (
+      <SwipeableDrawer
+        anchor="bottom"
+        open={props.drawerStatus}
+        onClose={() => props.setOpenDrawer(false)}
+        onOpen={() => props.setOpenDrawer(true)}
+        swipeAreaWidth={56}
+        disableSwipeToOpen={false}
+        ModalProps={{
+          keepMounted: true,
+        }}
+      >
+        {renderList()}
+      </SwipeableDrawer>
+    );
+  }
 
   return (
     <Grid
@@ -70,9 +98,9 @@ export const BookList = (props: {
         </Typography>
       </Stack>
 
-      <Container
+      <Box
         style={{ borderBottom: `1px solid ${theme.palette.grey[800]}` }}
-      ></Container>
+      ></Box>
 
       <Button
         variant="outlined"

@@ -21,7 +21,7 @@ const BookSchema = Yup.object().shape({
     .required("Required"),
   description: Yup.string()
     .min(10, "Too Short!")
-    .max(150, "Too Long!")
+    .max(450, "Too Long!")
     .required("Required"),
   type: Yup.string().required("Required"), // TODO: better to have this as a select input
 });
