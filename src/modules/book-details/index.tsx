@@ -84,6 +84,7 @@ export const BookDetails = (props: {
                     title: book.title,
                     author: book.author,
                     description: book.description,
+                    type: book.type,
                     id: book.id,
                   }}
                 />

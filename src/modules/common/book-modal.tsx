@@ -2,15 +2,13 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import { TextField } from "formik-mui";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import useSWRMutation from "swr/mutation";
 import { API_URL } from "../constants";
 import { useModalContext } from "../modals/modal-context";
-import { axiosInstance } from "../../api/utils";
 import { useUpdateBookById } from "../../api/useUpdateBook";
 import { useSWRConfig } from "swr";
 import { BookType } from "../types";
-import { useTheme } from "@mui/material/styles";
 import { ErrorMessage } from "./error-message";
+import { useCreateBook } from "../../api/useCreateBook";
 
 const BookSchema = Yup.object().shape({
   title: Yup.string()
@@ -25,31 +23,15 @@ const BookSchema = Yup.object().shape({
     .min(10, "Too Short!")
     .max(150, "Too Long!")
     .required("Required"),
-  type: Yup.string().required("Required"), // TODO: turn into a select?
+  type: Yup.string().required("Required"), // TODO: better to have this as a select input
 });
-
-async function createBook(
-  url: string,
-  {
-    arg,
-  }: {
-    arg: { title: string; author: string; description: string; type: string };
-  }
-) {
-  return await axiosInstance
-    .post(url, {
-      ...arg,
-    })
-    .then((res) => res.data);
-}
 
 export const CreateModal = (props: { bookData?: BookType }) => {
   const { bookData } = props;
   const { handleModal } = useModalContext();
-  const { trigger, error } = useSWRMutation(API_URL, createBook);
-  const { triggerUpdate } = useUpdateBookById();
+  const { triggerUpdate, updateErr } = useUpdateBookById();
+  const { triggerCreate, createErr } = useCreateBook();
   const { mutate } = useSWRConfig();
-  const theme = useTheme();
 
   const isUpdatingBook = props.bookData?.id;
 
@@ -80,7 +62,7 @@ export const CreateModal = (props: { bookData?: BookType }) => {
               // updates book details cache
               mutate([API_URL, bookData.id.toString()], book);
             } else {
-              await trigger({
+              await triggerCreate({
                 ...values,
               });
             }
@@ -133,7 +115,7 @@ export const CreateModal = (props: { bookData?: BookType }) => {
                 error={errors.type && touched.type}
                 helperText={errors.type && touched.type ? errors.type : ""}
               />
-              {error ? (
+              {createErr || updateErr ? (
                 <ErrorMessage
                   message={"There was an error completing your request"}
                 />

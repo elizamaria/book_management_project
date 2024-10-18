@@ -1,6 +1,4 @@
-import useSWR, { Fetcher } from "swr";
 import { API_URL } from "../modules/constants";
-import { BookType } from "../modules/types";
 import { axiosInstance } from "./utils";
 import useSWRMutation from "swr/mutation";
 
@@ -27,6 +25,6 @@ export function useUpdateBookById() {
     triggerUpdate: trigger,
     book: data,
     isMutating,
-    isError: error,
+    updateErr: error,
   };
 }
