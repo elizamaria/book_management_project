@@ -14,6 +14,7 @@ Start server:
 
 ```
 cd server
+npm i
 npm start
 ```
 
@@ -23,6 +24,7 @@ Start frontend:
 
 ```
 cd frontend
+npm i
 npm run dev
 ```
 
