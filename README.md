@@ -25,7 +25,7 @@ Start frontend:
 ```
 cd frontend
 npm i
-npm run dev
+npm start
 ```
 
 Runs the app in the development mode.\
